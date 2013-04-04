@@ -1,28 +1,26 @@
 var stack = function() {
     this.value = null;
     this.next = null;
+
+
+this.push = function(value){
+    var temp = new stack();
+    temp.value = value;
+    temp.next = this.next;
+    this.next = temp;
 }
 
-var push = function(){
-    var node = new stack();
-
-    node.next = stack.next;
-    stack.next = node;
-
+this.pop = function(){
+       var temp = this.next;
+       this.next = temp.next
+       return temp.value;
 }
-
-var pop = function pop(value){
-       var node = stack.next;
-       var rtn;
-    
-       stack.next = node.next
-       rtn = node.value;
-       
-       return rtn;
 }
      
+var s = new stack();
+s.push(1);
+s.push(2);
 
-var main = function(){
+console.log(s.pop());
+console.log(s.pop());
 
-
-}         
