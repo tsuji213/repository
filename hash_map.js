@@ -15,8 +15,16 @@ var hash = function(){
 
 		var n = makehash(key);
 
+		if(this.list[n].value == null){
 		this.list[n].key = key;
 		this.list[n].value = value;
+		}else{
+		var list_sub = new List();
+		list_sub.key = key;
+		list_sub.value = value;
+		list_sub.next = this.list[n].next;
+		this.list[n].next = list_sub;
+		}
 
 	}
 
@@ -24,10 +32,17 @@ var hash = function(){
 
 		var n = makehash(key);
 
+		if(this.list[n].key == key){
 		return this.list[n].value;
+		}
+		var list_sub = this.list[n].next;
 
+		while(list_sub.key != null){
+		if(list_sub.key = key) return list_sub.value;
+
+		list_sub = list_sub.next;
+		}
 	}
-
 
 var makehash = function(key){
 
@@ -41,8 +56,8 @@ var makehash = function(key){
 		}
 
 		return temp % 8;
-
 }
+
 }
 
 var hash = new hash(); 
@@ -53,3 +68,4 @@ hash.set("HI",8);
 
 console.log(hash.get("hello"));
 console.log(hash.get("HI"));
+console.log(hash.get("ABC"));
