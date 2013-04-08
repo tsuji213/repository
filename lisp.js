@@ -10,6 +10,7 @@ repl.prompt();
 // mainループ
 repl.on("line", function(line) {
     console.log(line); //変数lineにシェルに入力した文字列が入るので、これを解析すれば良い。
+    lisp(line);
     repl.prompt();
 });
 
@@ -19,13 +20,20 @@ repl.on("close", function() {
 });
 
 
+var lisp = function(line){
 
-
-var Cons = (function() {
-  function Cons(type,car,cdr) {
+var Cons = function(type,car,cdr) {
     this.type = type;
     this.car = car;
     this.cdr = cdr;
-  }
-  return Cons;
-})();
+};
+
+var token = new Array();
+
+	for(var i=0;i<line.length;i++){
+		switch(line.CharAt(i)){
+			
+			case "(":
+
+
+}
