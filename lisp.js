@@ -90,10 +90,7 @@ var lisp = function(line){
 				return null;
 
 			default:
-				if(token[i]==null){
-					//	console.log("error");
-					return;
-				}
+				if(token[i]==null) return;
 				return new Cons(typeof(token[i]),token[i],parse(i+1));
 		}
 	}
@@ -106,22 +103,11 @@ var lisp = function(line){
 	}
 
 	var tree = parse(1);
-	//console.log(tree);
+//	console.log(tree);
 	//console.log(tree.cdr.car.cdr.car);
 
 		this.hash = function(){
-/*		this.list = new Array();
 
-		var List = function(){
-		this.key = null;
-		this.value = null;
-		this.next = null;
-		}
-
-		for(var i=0;i<16;i++){
-		this.list[i] = new List();
-		}
-*/
 		this.set = function(key,value){
 
 		var n = makehash(key);
@@ -181,13 +167,17 @@ var lisp = function(line){
 
 		if(temp.cdr.type == "car"){
 			var n1=eval(temp.cdr.car);
-		}else{
+		}else if(typeof(temp.cdr.car)=="number"){
 			var n1=temp.cdr.car;
+		}else if(typeof(temp.cdr.car)=="string"){
+			var n1=hash.get(temp.cdr.car);
 		}
 		if(temp.cdr.cdr.type == "car"){
 			var n2=eval(temp.cdr.cdr.car);
-		}else{
+		}else if(typeof(temp.cdr.cdr.car)=="number"){
 			var n2=temp.cdr.cdr.car;
+		}else if(typeof(temp.cdr.cdr.car)=="string"){
+			var n2=hash.get(temp.cdr.cdr.car);
 		}
 
 		switch(temp.car){
@@ -226,6 +216,8 @@ var lisp = function(line){
 			case "setq":
 				hash.set(temp.cdr.car,temp.cdr.cdr.car);
 				return 0;
+			case "defun":
+				
 
 			default:
 
