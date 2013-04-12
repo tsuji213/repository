@@ -74,7 +74,6 @@ hash.set("b",5);
 hash.set("r",7);
 hash.set("s",9);
 hash.set("t",6);
-hash.set("u",0);
 
 console.log(hash.get("hello"));
 console.log(hash.get("HI"));
@@ -84,6 +83,5 @@ console.log(hash.get("b"));
 console.log(hash.get("r"));
 console.log(hash.get("s"));
 console.log(hash.get("t"));
-console.log(hash.get("u"));
 
 
