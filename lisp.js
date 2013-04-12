@@ -7,8 +7,10 @@ this.next = null;
 }
 
 for(var i=0;i<16;i++){
-list[i] = new List();
+	list[i] = new List();
 }
+
+
 
 
 var lisp = function(line){
@@ -103,7 +105,7 @@ var lisp = function(line){
 	}
 
 	var tree = parse(1);
-//	console.log(tree);
+	//console.log(tree);
 	//console.log(tree.cdr.car.cdr.car);
 
 		this.hash = function(){
@@ -163,21 +165,26 @@ var lisp = function(line){
 		this.hash = new hash();
 
 	this.eval = function(temp){
-		if(typeof(temp) == "string") return temp;
 
-		if(temp.cdr.type == "car"){
-			var n1=eval(temp.cdr.car);
-		}else if(typeof(temp.cdr.car)=="number"){
-			var n1=temp.cdr.car;
-		}else if(typeof(temp.cdr.car)=="string"){
-			var n1=hash.get(temp.cdr.car);
-		}
-		if(temp.cdr.cdr.type == "car"){
-			var n2=eval(temp.cdr.cdr.car);
-		}else if(typeof(temp.cdr.cdr.car)=="number"){
-			var n2=temp.cdr.cdr.car;
-		}else if(typeof(temp.cdr.cdr.car)=="string"){
-			var n2=hash.get(temp.cdr.cdr.car);
+		if(temp.car != "defun"){
+
+			if(typeof(temp) == "string") return temp;
+
+			if(temp.cdr.type == "car"){
+				var n1=eval(temp.cdr.car);
+			}else if(typeof(temp.cdr.car)=="number"){
+				var n1=temp.cdr.car;
+			}else if(typeof(temp.cdr.car)=="string"){
+				var n1=hash.get(temp.cdr.car);
+			}	
+			if(temp.cdr.cdr.type == "car"){
+				var n2=eval(temp.cdr.cdr.car);
+			}else if(typeof(temp.cdr.cdr.car)=="number"){
+				var n2=temp.cdr.cdr.car;
+			}else if(typeof(temp.cdr.cdr.car)=="string"){
+				var n2=hash.get(temp.cdr.cdr.car);
+			}
+
 		}
 
 		switch(temp.car){
@@ -217,22 +224,42 @@ var lisp = function(line){
 				hash.set(temp.cdr.car,temp.cdr.cdr.car);
 				return 0;
 			case "defun":
-				
+				hash.set(temp.cdr.car,temp.cdr.cdr);
+				return 0;
 
 			default:
+				console.log(hash.get(temp.car));
+				console.log(typeof(hash.get(temp.car)));
+				if(typeof(hash.get(temp.car))=="object"){
+					var arg_1 = new Array();
+					var arg_2 = new Array();
+					var next = function(temp){
+						return temp.cdr;
+					}
+					var n = hash.get(temp.car).car;
+					for(;n != null;n = next(n)){
+						arg_1.push(n.car);
+					}
+					n = temp.cdr;
+					for(;n != null;n = next(n)){
+						arg_2.push(n.car);
+					}
+					console.log(arg_1);
+					console.log(arg_2);
+					if(arg_1.length != arg_2.length){
+						console.log("error");
+						return 0;
+					}
+					for(var i=0;arg_1[i] != null;i++){
+						hash.set(arg_1[i],arg_2[i]);
+					}
+					return eval(hash.get(temp.car).cdr.car);
+					}
 
-
-
-
-
-
+				console.log("error");
+				return 0;
 		}
-
-
-
-
 	}
-
 	var log = eval(tree);
 	if(log == 0) return;
 	console.log(log);
