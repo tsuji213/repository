@@ -37,6 +37,10 @@ var hash = function(){
 		}
 		var list_sub = this.list[n].next;
 
+		if(list_sub==null){
+		return key + " is not define";
+		}
+
 		while(list_sub.key != null){
 		if(list_sub.key = key) return list_sub.value;
 
@@ -65,7 +69,21 @@ var hash = new hash();
 hash.set("ABC",2);
 hash.set("hello",4);
 hash.set("HI",8);
+hash.set("a",3);
+hash.set("b",5);
+hash.set("r",7);
+hash.set("s",9);
+hash.set("t",6);
+hash.set("u",0);
 
 console.log(hash.get("hello"));
 console.log(hash.get("HI"));
-console.log(hash.get("ABC"));
+console.log(hash.get("aafd"));
+console.log(hash.get("a"));
+console.log(hash.get("b"));
+console.log(hash.get("r"));
+console.log(hash.get("s"));
+console.log(hash.get("t"));
+console.log(hash.get("u"));
+
+
