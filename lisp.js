@@ -17,13 +17,66 @@ var lisp = function(line){
 
 	var Cons = (function() {
 			function Cons(type,car,cdr) {
-			this.type = type;
-			this.car = car;
-			this.cdr = cdr;
+				this.type = type;
+				this.car = car;
+				this.cdr = cdr;
 			}
 			return Cons;
 			})();
 
+	this.hash = function(){
+		this.set = function(key,value){
+			var n = makehash(key);
+
+			if(list[n].value == null){
+				list[n].key = key;
+				list[n].value = value;
+			}else if(list[n].key == key){
+				list[n].value = value;
+			}else{
+				var list_sub = new List();
+				list_sub.key = key;
+				list_sub.value = value;
+				list_sub.next = list[n].next;
+				list[n].next = list_sub;
+			}
+		}
+
+		this.get = function(key){
+
+			var n = makehash(key);
+
+			if(list[n].key == key){
+				return list[n].value;
+			}
+			var list_sub = list[n].next;
+
+			if(list_sub==null){
+				return key + " is not define\n";
+			}
+
+			while(list_sub.key != null){
+				if(list_sub.key = key){
+					return list_sub.value;
+				}
+			list_sub = list_sub.next;
+			}
+		}
+
+		var makehash = function(key){
+
+			var temp = 0;
+
+			for(var i=0;i<key.length;i++){
+				var c = key.charCodeAt(i);
+				temp =+ c;
+			}	
+
+			return temp % 16;
+		}
+	}
+
+	this.hash = new hash();
 
 	this.token = new Array();
 	var p = 0;
@@ -53,14 +106,18 @@ var lisp = function(line){
 
 		}
 	}
-	//console.log(token.length);
 
 	if(0<token.length && token.length<5){
-		console.log("error");
-		return;
+		if(typeof(hash.get(token[1])) != "object"){
+			console.log("error");
+			return;
+		}
 	}else if(token.length==0){
-		//	console.log(line);
-		console.log(this.hash.get(line));
+		if(isNaN(Number(line))){
+			console.log(hash.get(line));
+		}else{
+			console.log(line);
+		}
 		return;
 	}
 
@@ -68,8 +125,9 @@ var lisp = function(line){
 	var count_cdr = 0;
 
 	for(var i=0;token[i]!=null;i++){
-		if(Number(token[i])) token[i] = Number(token[i]);
-
+		if(isNaN(Number(token[i]))==false){
+			token[i] = Number(token[i]);
+		}
 		if(token[i] == "(") count_car++;
 		if(token[i] == ")") count_cdr++;
 	}
@@ -105,111 +163,77 @@ var lisp = function(line){
 	}
 
 	var tree = parse(1);
-	//console.log(tree);
-	//console.log(tree.cdr.car.cdr.car);
 
-		this.hash = function(){
-
-		this.set = function(key,value){
-
-		var n = makehash(key);
-
-		if(list[n].value == null){
-		list[n].key = key;
-		list[n].value = value;
-		}else{
-		var list_sub = new List();
-		list_sub.key = key;
-		list_sub.value = value;
-		list_sub.next = this.list[n].next;
-		list[n].next = list_sub;
-		}
-
-		}
-
-		this.get = function(key){
-
-		var n = makehash(key);
-
-		if(list[n].key == key){
-		return list[n].value;
-		}
-		var list_sub = list[n].next;
-
-		if(list_sub==null){
-		return key + " is not define";
-		}
-
-		while(list_sub.key != null){
-		if(list_sub.key = key) return list_sub.value;
-
-		list_sub = list_sub.next;
-		}
-		}
-
-		var makehash = function(key){
-
-		var temp = 0;
-
-		for(var i=0;i<key.length;i++){
-
-		var c = key.charCodeAt(i);
-		temp =+ c;
-
-		}	
-
-		return temp % 16;
-		}
-		}
-	 
-		this.hash = new hash();
+	var next = function(temp){
+		return temp.cdr;
+	}
 
 	this.eval = function(temp){
 
-		if(temp.car != "defun"){
-
-			if(typeof(temp) == "string") return temp;
-
-			if(temp.cdr.type == "car"){
-				var n1=eval(temp.cdr.car);
-			}else if(typeof(temp.cdr.car)=="number"){
-				var n1=temp.cdr.car;
-			}else if(typeof(temp.cdr.car)=="string"){
-				var n1=hash.get(temp.cdr.car);
-			}	
-			if(temp.cdr.cdr.type == "car"){
-				var n2=eval(temp.cdr.cdr.car);
-			}else if(typeof(temp.cdr.cdr.car)=="number"){
-				var n2=temp.cdr.cdr.car;
-			}else if(typeof(temp.cdr.cdr.car)=="string"){
-				var n2=hash.get(temp.cdr.cdr.car);
+		if(typeof(temp) == "number"){
+			return temp;
+		}else if(typeof(temp) == "string"){
+			if(typeof(hash.get(temp)) == "number"){
+				return hash.get(temp);
+			}else{
+				return temp;
 			}
+		}
 
+
+		if(temp.car != "defun" && typeof(hash.get(temp.car)) != "object"){
+
+			var nlist = new Array();
+			for(var n = next(temp);n != null;n = next(n)){
+				if(n.type == "car"){
+					nlist.push(eval(n.car));
+				}else if(typeof(n.car)=="number"){
+					nlist.push(n.car);
+				}else if(typeof(n.car)=="string"){
+					nlist.push(hash.get(n.car));
+				}
+			}	
 		}
 
 		switch(temp.car){
 			case "+":
-				return n1 + n2;
+				var res = nlist[0];
+				for(var i=1;nlist[i]!=null;i++){
+					res = res + nlist[i];
+				}
+				return res;
 			case "-":
-				return n1 - n2;
+				var res = nlist[0];
+				for(var i=1;nlist[i]!=null;i++){
+					res = res - nlist[i];
+				}
+				return res;
 			case "*":
-				return n1 * n2;
+				var res = nlist[0];
+				for(var i=1;nlist[i]!=null;i++){
+					res = res * nlist[i];
+				}
+				return res;
 			case "/":
-				return n1 / n2;
+				var res = nilst[0];
+				for(var i=1;nlist[i]!=null;i++){
+					res = res / nlist[i];
+				}
+				return res;
 			case "<":
-				if(n1 < n2){
+				if(nlist[0] < nlist[1]){
 					return "T";
 				}else{
 					return "Nil"
 				}
 			case "=":
-				if(n1 == n2){
+				if(nlist[0] == nlist[1]){
 					return "T";
 				}else{
 					return "Nil"
 				}
 			case ">":
-				if(n1 > n2){
+				if(nlist[0] > nlist[1]){
 					return "T";
 				}else{
 					return "Nil"
@@ -228,24 +252,19 @@ var lisp = function(line){
 				return 0;
 
 			default:
-				console.log(hash.get(temp.car));
-				console.log(typeof(hash.get(temp.car)));
 				if(typeof(hash.get(temp.car))=="object"){
 					var arg_1 = new Array();
 					var arg_2 = new Array();
-					var next = function(temp){
-						return temp.cdr;
-					}
-					var n = hash.get(temp.car).car;
-					for(;n != null;n = next(n)){
+					for(var n = hash.get(temp.car).car;n != null;n = next(n)){
 						arg_1.push(n.car);
 					}
-					n = temp.cdr;
-					for(;n != null;n = next(n)){
-						arg_2.push(n.car);
+					for(var n = temp.cdr;n != null;n = next(n)){
+						if(n.type == "car"){
+							arg_2.push(eval(n.car));
+						}else{
+							arg_2.push(n.car);
+						}
 					}
-					console.log(arg_1);
-					console.log(arg_2);
 					if(arg_1.length != arg_2.length){
 						console.log("error");
 						return 0;
@@ -264,20 +283,6 @@ var lisp = function(line){
 	if(log == 0) return;
 	console.log(log);
 
-
-	/*
-	   this.tree = new Array();
-
-	   for(i=1;token[i]!=null;i++){
-	   tree.push(parse(i));
-	   i = move(i);
-	   }
-	   for(var i=0;i<tree.length;i++){
-	   var temp = tree[0];
-	   console.log(temp.cdr);
-	   console.log(temp.cdr);
-	   }
-	 */
 }
 
 
