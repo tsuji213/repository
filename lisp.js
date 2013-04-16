@@ -10,8 +10,9 @@ for(var i=0;i<16;i++){
 	list[i] = new List();
 }
 
-
-
+var arg_stack_1 = new Array();
+var arg_stack_2 = new Array();
+var j = 0;
 
 var lisp = function(line){
 
@@ -180,11 +181,27 @@ var lisp = function(line){
 			}
 		}
 
+		//console.log(arg_stack_1[0]);
+/*
+		if(arg_stack_1[0] != null){
+		//	console.log(j);
 
-		if(temp.car != "defun" && typeof(hash.get(temp.car)) != "object"){
-
+			for(var i = 0;arg_stack_1[j][i]!=null;i++){
+				hash.set(arg_stack_1[j][i],arg_stack_2[j][i]);
+				console.log(arg_stack_2[j][i]);
+			}
+			//arg_stack_1[j] = null;
+			//arg_stack_2[j] = null;
+			console.log(hash.get("n"));
+			j++;
+		}
+*/
+		//console.log(temp.car);
+		//console.log(typeof(hash.get(temp.car)));
+		if(temp.car != "defun" && typeof(hash.get(temp.car)) != "object" && temp.car != "if"){
 			var nlist = new Array();
 			for(var n = next(temp);n != null;n = next(n)){
+		//		console.log(n);
 				if(n.type == "car"){
 					nlist.push(eval(n.car));
 				}else if(typeof(n.car)=="number"){
@@ -192,8 +209,19 @@ var lisp = function(line){
 				}else if(typeof(n.car)=="string"){
 					nlist.push(hash.get(n.car));
 				}
-			}	
+				//console.log(nlist);
+				
+			}
+			
+		//	console.log(0);
+		//	conosle.log(nlist[1]);
 		}
+/*
+		if(typeof(temp.car) == "object"){
+			return eval(temp.car);
+			return 0;
+		}
+*/
 
 		switch(temp.car){
 			case "+":
@@ -226,6 +254,13 @@ var lisp = function(line){
 				}else{
 					return "Nil"
 				}
+			case "<=":
+				if(nlist[0] <= nlist[1]){
+					return "T";
+				}else{
+					return "Nil"
+				}
+
 			case "=":
 				if(nlist[0] == nlist[1]){
 					return "T";
@@ -253,13 +288,23 @@ var lisp = function(line){
 
 			default:
 				if(typeof(hash.get(temp.car))=="object"){
+					if(arg_stack_2[j] != null){
+						for(var i=0;arg_stack_1[j][i] != null;i++){
+							hash.set(arg_stack_1[j][i],arg_stack_2[j][i]);
+						}
+					}
+					j++;
+				//		console.log(j);
+				//		console.log(arg_stack_2);
 					var arg_1 = new Array();
 					var arg_2 = new Array();
+
 					for(var n = hash.get(temp.car).car;n != null;n = next(n)){
 						arg_1.push(n.car);
 					}
 					for(var n = temp.cdr;n != null;n = next(n)){
 						if(n.type == "car"){
+						//	console.log(n.car);
 							arg_2.push(eval(n.car));
 						}else{
 							arg_2.push(n.car);
@@ -269,10 +314,22 @@ var lisp = function(line){
 						console.log("error");
 						return 0;
 					}
-					for(var i=0;arg_1[i] != null;i++){
-						hash.set(arg_1[i],arg_2[i]);
+					arg_stack_1[j] = arg_1;
+					arg_stack_2[j] = arg_2;
+
+					for(var i=0;arg_stack_1[j][i] != null;i++){
+						hash.set(arg_stack_1[j][i],arg_stack_2[j][i]);
 					}
-					return eval(hash.get(temp.car).cdr.car);
+					//console.log("++++++++++++++++");
+			//		console.log(hash.get("n"));	
+			//		console.log(j);
+				//	console.log(arg_stack_1[j]);
+			//		console.log(hash.get(temp.car).cdr.car.cdr);
+				//	var eval_sub = eval(hash.get(temp.car).cdr);
+					var eval_sub = eval(hash.get(temp.car).cdr.car);
+				//	console.log(2222222222222222);
+					j--;
+					return eval_sub;
 					}
 
 				console.log("error");
